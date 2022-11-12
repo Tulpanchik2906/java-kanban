@@ -1,31 +1,34 @@
 package tasks;
 
-import manager.TaskManager;
-
 import java.util.Objects;
 
 public class Task {
     private String name;
-    private String describe;
-    private String id;
+    private String description;
+    private int id;
     private Enum status;
 
-    public Task(String name, String describe) {
+    public Task(String name, String description, int id, Enum status) {
         this.name = name;
-        this.describe = describe;
-        this.id="Task - " + TaskManager.generateNewId();
+        this.description = description;
+        this.id = id;
+        this.status = status;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getDescribe() {
-        return describe;
+    public String getDescription() {
+        return description;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
+    }
+
+    public void setId(int id){
+        this.id = id;
     }
 
     public Enum getStatus() {
@@ -36,8 +39,8 @@ public class Task {
         this.name = name;
     }
 
-    public void setDescribe(String describe) {
-        this.describe = describe;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
 
@@ -51,22 +54,22 @@ public class Task {
         if (!(o instanceof Task)) return false;
         Task task = (Task) o;
         return Objects.equals(getName(), task.getName())
-                && Objects.equals(getDescribe(),
-                task.getDescribe())
+                && Objects.equals(getDescription(),
+                task.getDescription())
                 && Objects.equals(getId(), task.getId())
                 && Objects.equals(getStatus(), task.getStatus());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), getDescribe(), getId(), getStatus());
+        return Objects.hash(getName(), getDescription(), getId(), getStatus());
     }
 
     @Override
     public String toString() {
         return "tasks.Task{" +
                 "name='" + name + '\'' +
-                ", describe='" + describe + '\'' +
+                ", description='" + description + '\'' +
                 ", id='" + id + '\'' +
                 ", status=" + status +
                 '}';
