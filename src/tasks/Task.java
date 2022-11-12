@@ -15,6 +15,12 @@ public class Task {
         this.status = status;
     }
 
+    public Task(String name, String description, Enum status) {
+        this.name = name;
+        this.description = description;
+        this.status = status;
+    }
+
     public String getName() {
         return name;
     }

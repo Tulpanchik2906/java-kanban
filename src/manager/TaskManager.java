@@ -30,29 +30,23 @@ public class TaskManager {
 
     public int addTask(Task task) {
         // присваиваем id задачи
-        if (task.getId() <= 0) {
-            task.setId(generateNewId());
-        }
+        task.setId(generateNewId());
         tasks.put(task.getId(), task);
         return task.getId();
     }
 
     public int addEpic(Epic epic) {
-        if (epic.getId() <= 0) {
-            epic.setId(generateNewId());
-        }
+        epic.setId(generateNewId());
         epics.put(epic.getId(), epic);
         // Пересчитываем статус эпика
         epic.setStatus(getEpicStatus(epic));
-        return  epic.getId();
+        return epic.getId();
     }
 
     public int addSubTask(SubTask task) {
         // Проверяем, что эпик для сабтаски есть, иначе не добавляем сабтаску
         if (epics.containsKey(task.getEpicId())) {
-            if (task.getId() <= 0) {
-                task.setId(generateNewId());
-            }
+            task.setId(generateNewId());
             subTasks.put(task.getId(), task);
             // добавляем сабтаску в список сабтасок эпика
             final Epic epic = epics.get(task.getEpicId());
@@ -152,7 +146,7 @@ public class TaskManager {
             } else {
                 System.out.println("Нет эпика подзадачи, подзадача не добавилась");
             }
-        }else {
+        } else {
             System.out.println("Нет такой сабтаски, подзадача не добавилась");
         }
     }

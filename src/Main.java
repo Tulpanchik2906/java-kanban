@@ -10,18 +10,18 @@ public class Main {
         TaskManager taskManager = new TaskManager();
 
         // Добавление одного эпика с двумя задачами
-        Epic epic1 = new Epic("Epic1", "Describe Epic1", -1, Status.NEW);
+        Epic epic1 = new Epic("Epic1", "Describe Epic1", Status.NEW);
         taskManager.addEpic(epic1);
         System.out.println(epic1.getId());
-        SubTask subTask1 = new SubTask("SubTask1", "SubTask1 By Epic1",-1, Status.NEW, epic1.getId());
-        SubTask subTask2 = new SubTask("SubTask2", "SubTask2 By Epic1", -1, Status.IN_PROGRESS, epic1.getId());
+        SubTask subTask1 = new SubTask("SubTask1", "SubTask1 By Epic1", Status.NEW, epic1.getId());
+        SubTask subTask2 = new SubTask("SubTask2", "SubTask2 By Epic1",  Status.IN_PROGRESS, epic1.getId());
         taskManager.addSubTask(subTask1);
         taskManager.addSubTask(subTask2);
 
         // Добавление одного эпика с одной задачей
-        Epic epic2 = new Epic("Epic2", "Describe Epic2", -1, Status.NEW);
+        Epic epic2 = new Epic("Epic2", "Describe Epic2",  Status.NEW);
         taskManager.addEpic(epic2);
-        SubTask subTask3 = new SubTask("SubTask1", "SubTask1 By Epic2",-1, Status.NEW, epic2.getId());
+        SubTask subTask3 = new SubTask("SubTask1", "SubTask1 By Epic2", Status.NEW, epic2.getId());
         taskManager.addSubTask(subTask3);
 
         printTestInfo(epic1, taskManager);
