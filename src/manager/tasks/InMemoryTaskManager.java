@@ -89,7 +89,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<Task> getAllTaskByTypeTask() {
+    public List<Task> getTasks() {
         ArrayList<Task> list = new ArrayList<>();
         for (Task task : tasks.values()) {
             list.add(task);
@@ -98,7 +98,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<Epic> getAllTaskByTypeEpic() {
+    public List<Epic> getEpics() {
         ArrayList<Epic> list = new ArrayList<>();
         for (Epic epic : epics.values()) {
             list.add(epic);
@@ -107,7 +107,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<SubTask> getAllTaskByTypeSubTask() {
+    public List<SubTask> getSubTasks() {
         ArrayList<SubTask> list = new ArrayList<>();
         for (SubTask subTask : subTasks.values()) {
             list.add(subTask);
@@ -116,7 +116,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task getTask(Integer id) {
+    public Task getTask(int id) {
         Task task = tasks.get(id);
         historyManager.add(task);
         return task;
@@ -185,7 +185,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void removeEpicById(Integer id) {
+    public void removeEpicById(int id) {
         if (epics.containsKey(id)) {
             // если удаляется epic, то удаляются и  его подзадачи
             Epic epic = epics.get(id);
@@ -199,7 +199,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void removeSubTaskById(Integer id) {
+    public void removeSubTaskById(int id) {
         if (subTasks.containsKey(id)) {
             // то удаляем задачу и пересчитываем статус для эпика
             Epic epic = epics.get(subTasks.get(id).getEpicId());
@@ -212,7 +212,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<SubTask> getAllSubTaskByEpicId(int epicId) {
+    public List<SubTask> getAllSubTaskByEpicId(int epicId) {
         ArrayList<SubTask> subTasks = new ArrayList<>();
         for (int id : epics.get(epicId).getSubTaskIds()) {
             subTasks.add(this.subTasks.get(id));
@@ -220,8 +220,11 @@ public class InMemoryTaskManager implements TaskManager {
         return subTasks;
     }
 
-    @Override
-    public Status getEpicStatus(Epic epic) {
+    /*
+        оставила название getEpicStatus(Epic epic), так как в нем не меняю статус у эпика,
+        а только получаю тот, на который нужно обновить, мб, назвать getStatusForUpdateStatusEpic(Epic epic)
+     */
+    private Status getEpicStatus(Epic epic) {
         List<Integer> subTaskIdsList = epic.getSubTaskIds();
 
         if (subTaskIdsList.isEmpty()) {
