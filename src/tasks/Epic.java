@@ -9,12 +9,12 @@ public class Epic extends Task {
     private List<Integer> subTaskIds;
 
 
-    public Epic(String name, String description, int id, Enum status) {
+    public Epic(String name, String description, int id, Status status) {
         super(name, description, id, status);
         subTaskIds = new ArrayList();
     }
 
-    public Epic(String name, String description,Enum status) {
+    public Epic(String name, String description,Status status) {
         super(name, description, status);
         subTaskIds = new ArrayList();
     }
