@@ -39,7 +39,7 @@ public interface TaskManager {
 
     public void updateSubTask(SubTask subTask);
 
-    public void removeTaskById(String id);
+    public void removeTaskById(int id);
 
     public void removeEpicById(int id);
 

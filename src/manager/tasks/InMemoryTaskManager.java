@@ -67,11 +67,22 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void cleanTasks() {
+        //Удаление из истории просмотров
+        for(int id : tasks.keySet()){
+            historyManager.remove(id);
+        }
         tasks.clear();
     }
 
     @Override
     public void cleanEpics() {
+        //Удаление из истории просмотров
+        for(int id : epics.keySet()){
+            historyManager.remove(id);
+        }
+        for(int id : subTasks.keySet()){
+            historyManager.remove(id);
+        }
         // если удалились все эпики, то удалились и все сабтаски
         epics.clear();
         subTasks.clear();
@@ -79,6 +90,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void cleanSubTasks() {
+        //Удаление из истории просмотров
+        for(int id : subTasks.keySet()){
+            historyManager.remove(id);
+        }
         subTasks.clear();
         // если удалились все сабтаски, то у всех эпиков статус должен быть New
         for (Epic epic : epics.values()) {
@@ -176,9 +191,10 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void removeTaskById(String id) {
+    public void removeTaskById(int id) {
         if (tasks.containsKey(id)) {
             tasks.remove(id);
+            historyManager.remove(id);
         } else {
             System.out.println("Нет такой задачи");
         }
@@ -191,8 +207,10 @@ public class InMemoryTaskManager implements TaskManager {
             Epic epic = epics.get(id);
             for (int subTaskId : epic.getSubTaskIds()) {
                 subTasks.remove(subTaskId);
+                historyManager.remove(subTaskId);
             }
             epics.remove(id);
+            historyManager.remove(id);
         } else {
             System.out.println("Нет такой задачи");
         }
@@ -203,9 +221,10 @@ public class InMemoryTaskManager implements TaskManager {
         if (subTasks.containsKey(id)) {
             // то удаляем задачу и пересчитываем статус для эпика
             Epic epic = epics.get(subTasks.get(id).getEpicId());
-            epic.getSubTaskIds().remove(id);
+            epic.getSubTaskIds().remove((Integer)id);
             epic.setStatus(getEpicStatus(epic));
             subTasks.remove(id);
+            historyManager.remove(id);
         } else {
             System.out.println("Нет такой задачи");
         }
