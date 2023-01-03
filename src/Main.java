@@ -7,6 +7,7 @@ import tasks.SubTask;
 import tasks.Task;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -157,6 +158,7 @@ public class Main {
     public static void testFourPracticum() throws IOException {
         Path path = Paths.get("managerState.txt");
         FileBackedTasksManager taskManager = new FileBackedTasksManager(path);
+
         // Добавление двух задач типа Task
         Task task1 = new Task("Task_1", "Describe Task_1", Status.NEW);
         Task task2 = new Task("Task_2", "Describe Task_2", Status.NEW);
@@ -177,9 +179,10 @@ public class Main {
         System.out.println("После добавления 2-х задач типа Task и одного Epic с 3-мя SubTask:");
         printHistory(taskManager.getHistory());
 
+        FileBackedTasksManager tasksManagerFromFile = FileBackedTasksManager.loadFromFile(path.toFile());
         // восстановление менеджера
         System.out.println("Состояние после восстановления:");
-        FileBackedTasksManager tasksManagerFromFile = FileBackedTasksManager.loadFromFile(path.toFile());
+        tasksManagerFromFile = FileBackedTasksManager.loadFromFile(path.toFile());
         printHistory(tasksManagerFromFile.getHistory());
 
         System.out.println("Тестирование повтора задачи типа Task.");
@@ -257,6 +260,9 @@ public class Main {
         System.out.println("Состояние после восстановления:");
         tasksManagerFromFile = FileBackedTasksManager.loadFromFile(path.toFile());
         printHistory(tasksManagerFromFile.getHistory());
+
+        // Удаление файла после теста
+        Files.delete(path);
 
     }
 
