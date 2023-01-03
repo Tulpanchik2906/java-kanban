@@ -3,6 +3,7 @@ package manager.tasks;
 import tasks.*;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -19,7 +20,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     private void save() {
 
-        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(path.toFile().getName()))) {
+        try (BufferedWriter bufferedWriter = new BufferedWriter(
+                new FileWriter(path.toFile().getName(), StandardCharsets.UTF_8))) {
             bufferedWriter.append(getFirstStringForSaveInFile());
             bufferedWriter.newLine();
             saveTasks(bufferedWriter);
@@ -32,14 +34,16 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    public void loadFromFile(Path path) throws IOException {
-        // Очищается текущее состояние менеджера и заменяем на состояние из файла
-        super.cleanTasks();
-        super.cleanEpics();
-        super.cleanSubTasks();
+    public static FileBackedTasksManager loadFromFile(File file) throws IOException {
+        FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager(file.toPath());
+        fileBackedTasksManager.loadFromFile(file.toPath());
+        return fileBackedTasksManager;
+    }
 
+    private void loadFromFile(Path path) throws IOException {
         // Парсится содержимое файла
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(path.toFile().getName()))) {
+        try (BufferedReader bufferedReader = new BufferedReader(
+                new FileReader(path.toFile().getName(), StandardCharsets.UTF_8))) {
             // Восстанавливаем задачи
             // Читается первая строка с названием колонок
             String line = bufferedReader.readLine();

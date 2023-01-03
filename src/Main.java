@@ -174,17 +174,89 @@ public class Main {
         taskManager.addSubTask(subTask2);
         taskManager.addSubTask(subTask3);
 
-        System.out.println("Состояние до восстановления:");
+        System.out.println("После добавления 2-х задач типа Task и одного Epic с 3-мя SubTask:");
         printHistory(taskManager.getHistory());
 
         // восстановление менеджера
         System.out.println("Состояние после восстановления:");
-        taskManager.loadFromFile(path);
+        FileBackedTasksManager tasksManagerFromFile = FileBackedTasksManager.loadFromFile(path.toFile());
+        printHistory(tasksManagerFromFile.getHistory());
+
+        System.out.println("Тестирование повтора задачи типа Task.");
+        System.out.println("В порядке 2 - 1:");
+        taskManager.getTask(task1.getId());
+        taskManager.getTask(task2.getId());
+        printHistory(taskManager.getHistory());
+        System.out.println("В порядке 1 - 2:");
+        taskManager.getTask(task1.getId());
         printHistory(taskManager.getHistory());
 
+        System.out.println("Состояние после восстановления:");
+        tasksManagerFromFile = FileBackedTasksManager.loadFromFile(path.toFile());
+        printHistory(tasksManagerFromFile.getHistory());
 
+        // Тестирование повтора задачи типа Epic
+        System.out.println("Тестирование повтора задачи типа Epic.");
+        System.out.println("Один раз вызвали эпик:");
+        taskManager.getEpic(epic1.getId());
+        printHistory(taskManager.getHistory());
+        System.out.println("Два раза вызвали эпик:");
+        taskManager.getEpic(epic1.getId());
+        printHistory(taskManager.getHistory());
 
+        System.out.println("Состояние после восстановления:");
+        tasksManagerFromFile = FileBackedTasksManager.loadFromFile(path.toFile());
+        printHistory(tasksManagerFromFile.getHistory());
 
+        // Тестирование повтора задачи типа SubTask
+        System.out.println("Тестирование повтора задачи типа SubTask.");
+        System.out.println("Один раз вызвали подзадачу:");
+        taskManager.getSubTask(subTask1.getId());
+        printHistory(taskManager.getHistory());
+        System.out.println("Два раза вызвали подзадачу:");
+        taskManager.getSubTask(subTask1.getId());
+        printHistory(taskManager.getHistory());
+
+        System.out.println("Состояние после восстановления:");
+        tasksManagerFromFile = FileBackedTasksManager.loadFromFile(path.toFile());
+        printHistory(tasksManagerFromFile.getHistory());
+
+        //Проверка удаления одной задачи типа Task
+        System.out.println("Проверка удаления одной задачи типа Task.");
+        taskManager.removeTaskById(task1.getId());
+        printHistory(taskManager.getHistory());
+
+        System.out.println("Состояние после восстановления:");
+        tasksManagerFromFile = FileBackedTasksManager.loadFromFile(path.toFile());
+        printHistory(tasksManagerFromFile.getHistory());
+
+        //Проверка удаления одной задачи типа SubTask
+        System.out.println("Проверка удаления одной задачи типа SubTask");
+        taskManager.removeSubTaskById(subTask1.getId());
+        printHistory(taskManager.getHistory());
+
+        System.out.println("Состояние после восстановления:");
+        tasksManagerFromFile = FileBackedTasksManager.loadFromFile(path.toFile());
+        printHistory(tasksManagerFromFile.getHistory());
+
+        //Проверка удаления одной задачи типа Epic
+        System.out.println("Проверка удаления одной задачи типа Epic");
+        taskManager.removeEpicById(epic1.getId());
+        printHistory(taskManager.getHistory());
+
+        System.out.println("Состояние после восстановления:");
+        tasksManagerFromFile = FileBackedTasksManager.loadFromFile(path.toFile());
+        printHistory(tasksManagerFromFile.getHistory());
+
+        // Проверка добавления задачи типа Task после удаления
+        System.out.println("Проверка добавления задачи типа Task после удаления:");
+        taskManager.addTask(task1);
+        taskManager.getTask(task1.getId());
+        printHistory(taskManager.getHistory());
+
+        System.out.println("Состояние после восстановления:");
+        tasksManagerFromFile = FileBackedTasksManager.loadFromFile(path.toFile());
+        printHistory(tasksManagerFromFile.getHistory());
 
     }
 

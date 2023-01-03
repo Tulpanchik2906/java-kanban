@@ -39,6 +39,10 @@ public class CustomLinkedList<T extends Task> {
     }
 
     public void linkLast(T element) {
+        // Если элемент null
+        if(element == null){
+            return;
+        }
         // Если эту задачу уже просматривали, то надо ее сначала удалить
         if (map.containsKey(element.getId())) {
             remove(element.getId());
