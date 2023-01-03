@@ -1,17 +1,22 @@
 import manager.Managers;
+import manager.tasks.FileBackedTasksManager;
 import manager.tasks.TaskManager;
 import tasks.Epic;
 import tasks.Status;
 import tasks.SubTask;
 import tasks.Task;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         System.out.println("Поехали!");
-        testThreePracticum();
+        testFourPracticum();
+        //testThreePracticum();
         //testSecondPracticum();
         //testFirstPracticum();
     }
@@ -101,6 +106,8 @@ public class Main {
         taskManager.addSubTask(subTask2);
         taskManager.addSubTask(subTask3);
 
+        printHistory(taskManager.getHistory());
+
         // Тестирование повтора задачи типа Task
         System.out.println("Тестирование повтора задачи типа Task.");
         System.out.println("В порядке 2 - 1:");
@@ -143,6 +150,40 @@ public class Main {
         System.out.println("Проверка удаления одной задачи типа Epic");
         taskManager.removeEpicById(epic1.getId());
         printHistory(taskManager.getHistory());
+
+
+    }
+
+    public static void testFourPracticum() throws IOException {
+        Path path = Paths.get("managerState.txt");
+        FileBackedTasksManager taskManager = new FileBackedTasksManager(path);
+        // Добавление двух задач типа Task
+        Task task1 = new Task("Task_1", "Describe Task_1", Status.NEW);
+        Task task2 = new Task("Task_2", "Describe Task_2", Status.NEW);
+        taskManager.addTask(task1);
+        taskManager.addTask(task2);
+
+        // Добавление одного эпика с тремя подзадачами
+        Epic epic1 = new Epic("Epic1", "Describe Epic1", Status.NEW);
+        taskManager.addEpic(epic1);
+
+        SubTask subTask1 = new SubTask("SubTask1", "SubTask1 By Epic1", Status.NEW, epic1.getId());
+        SubTask subTask2 = new SubTask("SubTask2", "SubTask2 By Epic1", Status.IN_PROGRESS, epic1.getId());
+        SubTask subTask3 = new SubTask("SubTask3", "SubTask3 By Epic1", Status.NEW, epic1.getId());
+        taskManager.addSubTask(subTask1);
+        taskManager.addSubTask(subTask2);
+        taskManager.addSubTask(subTask3);
+
+        System.out.println("Состояние до восстановления:");
+        printHistory(taskManager.getHistory());
+
+        // восстановление менеджера
+        System.out.println("Состояние после восстановления:");
+        taskManager.loadFromFile(path);
+        printHistory(taskManager.getHistory());
+
+
+
 
 
     }
