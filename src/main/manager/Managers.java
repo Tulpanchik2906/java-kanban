@@ -1,10 +1,10 @@
-package manager;
+package main.manager;
 
-import manager.history.HistoryManager;
-import manager.history.InMemoryHistoryManager;
-import manager.tasks.FileBackedTasksManager;
-import manager.tasks.InMemoryTaskManager;
-import manager.tasks.TaskManager;
+import main.manager.history.HistoryManager;
+import main.manager.history.InMemoryHistoryManager;
+import main.manager.tasks.FileBackedTasksManager;
+import main.manager.tasks.InMemoryTaskManager;
+import main.manager.tasks.TaskManager;
 
 import java.nio.file.Path;
 

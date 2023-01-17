@@ -1,10 +1,12 @@
-import manager.Managers;
-import manager.tasks.FileBackedTasksManager;
-import manager.tasks.TaskManager;
-import tasks.Epic;
-import tasks.Status;
-import tasks.SubTask;
-import tasks.Task;
+package main;
+
+import main.manager.Managers;
+import main.manager.tasks.FileBackedTasksManager;
+import main.manager.tasks.TaskManager;
+import main.tasks.Epic;
+import main.tasks.Status;
+import main.tasks.SubTask;
+import main.tasks.Task;
 
 import java.io.IOException;
 import java.nio.file.Files;

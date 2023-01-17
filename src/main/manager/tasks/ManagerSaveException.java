@@ -1,8 +1,4 @@
-package manager.tasks;
-
-import manager.Managers;
-
-import java.io.IOException;
+package main.manager.tasks;
 
 public class ManagerSaveException extends RuntimeException {
 

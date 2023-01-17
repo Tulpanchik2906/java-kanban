@@ -1,6 +1,6 @@
-package manager.tasks;
+package main.manager.tasks;
 
-import tasks.*;
+import main.tasks.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

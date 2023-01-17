@@ -1,11 +1,11 @@
-package manager.tasks;
+package main.manager.tasks;
 
-import manager.Managers;
-import manager.history.HistoryManager;
-import tasks.Epic;
-import tasks.Status;
-import tasks.SubTask;
-import tasks.Task;
+import main.manager.Managers;
+import main.manager.history.HistoryManager;
+import main.tasks.Epic;
+import main.tasks.Status;
+import main.tasks.SubTask;
+import main.tasks.Task;
 
 import java.util.*;
 
