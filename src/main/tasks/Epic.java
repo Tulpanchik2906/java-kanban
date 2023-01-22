@@ -1,5 +1,6 @@
 package main.tasks;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -7,6 +8,17 @@ import java.util.Objects;
 public class Epic extends Task {
 
     private List<Integer> subTaskIds;
+
+    @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    private LocalDateTime endTime;
 
 
     public Epic(String name, String description, int id, Status status) {

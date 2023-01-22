@@ -6,6 +6,7 @@ import main.manager.tasks.FileBackedTasksManager;
 import main.manager.tasks.InMemoryTaskManager;
 import main.manager.tasks.TaskManager;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 public class Managers {
@@ -14,7 +15,7 @@ public class Managers {
         return new InMemoryTaskManager();
     }
 
-    public static TaskManager getFileBackedTaskManager(Path path){
+    public static TaskManager getFileBackedTaskManager(Path path) throws IOException {
         return new FileBackedTasksManager(path);
     }
 
