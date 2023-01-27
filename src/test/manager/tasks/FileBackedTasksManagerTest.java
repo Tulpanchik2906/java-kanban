@@ -1,4 +1,4 @@
-package test.taskmanager;
+package test.manager.tasks;
 
 import main.manager.tasks.FileBackedTasksManager;
 import main.tasks.Epic;

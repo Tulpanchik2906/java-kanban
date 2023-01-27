@@ -1,4 +1,4 @@
-package test.taskmanager;
+package test.manager.tasks;
 
 import main.manager.tasks.TaskManager;
 import main.tasks.Epic;
