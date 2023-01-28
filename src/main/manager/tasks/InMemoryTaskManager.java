@@ -2,11 +2,13 @@ package main.manager.tasks;
 
 import main.manager.Managers;
 import main.manager.history.HistoryManager;
+import main.manager.tasks.exception.TaskValidationException;
 import main.tasks.Epic;
 import main.tasks.Status;
 import main.tasks.SubTask;
 import main.tasks.Task;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -18,6 +20,9 @@ public class InMemoryTaskManager implements TaskManager {
     private final HistoryManager historyManager;
     private static int id = 0;
 
+    // new TreeSet<>(Comparator.comparing(Task::getStartTime));
+    // Не взлетело, мб надо как-то дорабатывать метод getStartTime?
+    // Бросает NullPointerException
     Comparator<Task> comparator = (o1, o2) -> {
         if (o1.getStartTime() == null) {
             return 1;
@@ -50,15 +55,17 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public int addTask(Task task) {
+        if(task == null){
+            throw new TaskValidationException("Передано null-значение.");
+        }
         // Проверяем можено ли добавить задачу без пересечения с другими задачами
-        // Если есть пересечения, то возращаем -1;
         if (checkIntersection(task)) {
-            return -1;
+            throw new TaskValidationException("Задача имеет пересечение с другими задачами. Добавление не произошло.");
         }
         // Проверка есть ли такой номер в менеджере задач
-        // Если есть, то вернется номер -1
         if (containsIdInTaskManager(task)) {
-            return -1;
+            throw new TaskValidationException(
+                    "Задача с id=" + task.getId() + " уже существует, добавление не произошло.");
         }
         // Проверка есть ли у задачи номер (если нет, то присваиваем)
         if (task.getId() == 0) {
@@ -72,10 +79,12 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public int addEpic(Epic epic) {
+        if(epic == null){
+            throw new TaskValidationException("Передано null-значение.");
+        }
         // Проверка есть ли такой номер в менеджере задач
-        // Если есть, то вернется номер -1
         if (containsIdInTaskManager(epic)) {
-            return -1;
+            throw new TaskValidationException("Эпик с id=" + epic.getId() + " уже существует, добавление не произошло.");
         }
         // Проверяем есть ли у задачи номер (если нет, то присваиваем)
         if (epic.getId() == 0) {
@@ -93,6 +102,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public int addSubTask(SubTask subTask) {
+        if(subTask == null){
+            throw new TaskValidationException("Передано null-значение.");
+        }
         // Проверяем, что эпик для сабтаски есть, иначе не добавляем сабтаску
         if (epics.containsKey(subTask.getEpicId())) {
             // Проверяем есть ли у задачи номер (если нет, то присваиваем)
@@ -101,14 +113,14 @@ public class InMemoryTaskManager implements TaskManager {
                 subTask.setId(generateNewId());
             }
             // Проверка есть ли такой номер в менеджере задач
-            // Если есть, то вернется номер -1
             if (containsIdInTaskManager(subTask)) {
-                return -1;
+                throw new TaskValidationException(
+                        "Подзадача с id=" + subTask.getId() + " уже существует, добавление не произошло.");
             }
             // Проверяем можено ли добавить задачу без пересечения с другими задачами
-            // Если есть пересечения, то возращаем -1;
             if (checkIntersection(subTask)) {
-                return -1;
+                throw new TaskValidationException(
+                        "Подзадача имеет пересечение с другими задачами. Добавление не произошло.");
             }
             subTasks.put(subTask.getId(), subTask);
             sortedAllTasks.add(subTask);
@@ -120,7 +132,7 @@ public class InMemoryTaskManager implements TaskManager {
             epic.setStartTime(getStartTimeEpic(epic));
             epic.setEndTime(getEndTimeEpic(epic));
         } else {
-            System.out.println("Нет такого эпика, подзадача не добавилась");
+            throw new TaskValidationException("Нет такого эпика, подзадача не добавилась.");
         }
         return subTask.getId();
     }
@@ -224,11 +236,10 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateTask(Task task) {
         if (task == null) {
-            System.out.println("Передано null-значение");
-            return;
+            throw new TaskValidationException("Передано null-значение.");
         }
         if (!tasks.containsKey(task.getId())) {
-            System.out.println("Обновление невозможно, такая задача не найдена");
+            throw new TaskValidationException("Обновление невозможно, такая задача не найдена.");
         } else {
             // Проверяем можено ли добавить задачу без пересечения с другими задачами
             if (!checkIntersection(task)) {
@@ -236,8 +247,8 @@ public class InMemoryTaskManager implements TaskManager {
                 sortedAllTasks.remove(task);
                 sortedAllTasks.add(task);
             } else {
-                System.out.println("Обновление невозможно," +
-                        " так как данная задача пересекается с другой запланированной задачей");
+                throw new TaskValidationException("Обновление невозможно," +
+                        " так как данная задача пересекается с другой запланированной задачей.");
             }
         }
     }
@@ -245,11 +256,10 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateEpic(Epic epic) {
         if (epic == null) {
-            System.out.println("Передано null-значение");
-            return;
+            throw new TaskValidationException("Передано null-значение.");
         }
         if (!epics.containsKey(epic.getId())) {
-            System.out.println("Обновление невозможно, такой эпик не найден");
+            throw new TaskValidationException("Обновление невозможно, такой эпик не найден.");
         } else {
             epic.setStartTime(getStartTimeEpic(epic));
             epic.setStatus(getEpicStatus(epic));
@@ -261,16 +271,15 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateSubTask(SubTask subTask) {
         if (subTask == null) {
-            System.out.println("Передано null-значение");
-            return;
+            throw new TaskValidationException("Передано null-значение.");
         }
         // Проверяем, что id такой сабтаски есть
         if (subTasks.containsKey(subTask.getId())) {
             // Проверяем, что эпик для сабтаски есть, иначе не добавляем сабтаску
             if (epics.containsKey(subTask.getEpicId())) {
                 if (checkIntersection(subTask)) {
-                    System.out.println("Обновление невозможно," +
-                            " так как данная задача пересекается с другой запланированной задачей");
+                    throw new TaskValidationException("Обновление невозможно," +
+                            " так как данная задача пересекается с другой запланированной задачей.");
                 } else {
                     subTasks.put(subTask.getId(), subTask);
                     // добавляем сабтаску в список сабтасок эпика
@@ -284,10 +293,10 @@ public class InMemoryTaskManager implements TaskManager {
                     epic.setEndTime(getEndTimeEpic(epic));
                 }
             } else {
-                System.out.println("Нет эпика подзадачи, подзадача не добавилась");
+                throw new TaskValidationException("Нет эпика подзадачи, подзадача не добавилась.");
             }
         } else {
-            System.out.println("Нет такой сабтаски, подзадача не добавилась");
+            throw new TaskValidationException("Нет такой сабтаски, подзадача не добавилась.");
         }
     }
 
@@ -298,7 +307,7 @@ public class InMemoryTaskManager implements TaskManager {
             tasks.remove(id);
             historyManager.remove(id);
         } else {
-            System.out.println("Нет такой задачи");
+            throw new TaskValidationException("Нет задачи c id:" +id +".");
         }
     }
 
@@ -315,7 +324,7 @@ public class InMemoryTaskManager implements TaskManager {
             epics.remove(id);
             historyManager.remove(id);
         } else {
-            System.out.println("Нет такой задачи");
+            throw new TaskValidationException("Нет эпика c id:" +id +".");
         }
     }
 
@@ -332,7 +341,7 @@ public class InMemoryTaskManager implements TaskManager {
             subTasks.remove(id);
             historyManager.remove(id);
         } else {
-            System.out.println("Нет такой задачи");
+            throw new TaskValidationException("Нет подзадачи c id:" +id +".");
         }
     }
 
@@ -367,22 +376,20 @@ public class InMemoryTaskManager implements TaskManager {
         for (Task task : taskList) {
             // Если задачу пытаются обновить,
             // то она уже есть в списке для сравнения и может пересечься сама с собой
-            if (task.getId() != newTask.getId()) {
-                if (task.getStartTime() != null) {
-                    if (task.getStartTime().isEqual(newTask.getEndTime())) {
-                        return true;
-                    }
-                    if (task.getEndTime().isEqual(newTask.getStartTime())) {
-                        return true;
-                    }
-                    if (newTask.getStartTime().isBefore(task.getStartTime())
-                            && newTask.getEndTime().isAfter(task.getStartTime())) {
-                        return true;
-                    }
-                    if (newTask.getStartTime().isAfter(task.getStartTime())
-                            && task.getEndTime().isAfter(newTask.getStartTime())) {
-                        return true;
-                    }
+            if (task.getId() != newTask.getId() && task.getStartTime() != null) {
+                if (task.getStartTime().isEqual(newTask.getEndTime())) {
+                    return true;
+                }
+                if (task.getEndTime().isEqual(newTask.getStartTime())) {
+                    return true;
+                }
+                if (newTask.getStartTime().isBefore(task.getStartTime())
+                        && newTask.getEndTime().isAfter(task.getStartTime())) {
+                    return true;
+                }
+                if (newTask.getStartTime().isAfter(task.getStartTime())
+                        && task.getEndTime().isAfter(newTask.getStartTime())) {
+                    return true;
                 }
             }
         }
@@ -413,10 +420,6 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
 
-    /*
-        оставила название getEpicStatus(Epic epic), так как в нем не меняю статус у эпика,
-        а только получаю тот, на который нужно обновить, мб, назвать getStatusForUpdateStatusEpic(Epic epic)
-     */
     private Status getEpicStatus(Epic epic) {
         List<Integer> subTaskIdsList = epic.getSubTaskIds();
 

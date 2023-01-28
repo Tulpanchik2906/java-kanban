@@ -1,6 +1,7 @@
 package test.manager.tasks;
 
 import main.manager.Managers;
+import main.manager.tasks.InMemoryTaskManager;
 import main.manager.tasks.TaskManager;
 import main.tasks.Epic;
 import main.tasks.Status;
@@ -17,7 +18,7 @@ public class EpicStatusTest {
 
     @BeforeEach
     public void beforeEach() {
-        taskManager = Managers.getDefault();
+        taskManager = new InMemoryTaskManager();
         epic = new Epic("Epic1", "Describe Epic1", Status.NEW);
         taskManager.addEpic(epic);
     }

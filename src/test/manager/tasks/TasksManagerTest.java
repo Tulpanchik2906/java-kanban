@@ -1,6 +1,7 @@
 package test.manager.tasks;
 
 import main.manager.tasks.TaskManager;
+import main.manager.tasks.exception.TaskValidationException;
 import main.tasks.Epic;
 import main.tasks.Status;
 import main.tasks.SubTask;
@@ -50,9 +51,10 @@ public abstract class TasksManagerTest<T extends TaskManager> {
     // Метод addTask: Тест получения ошибки при попытки сохранить null-значение
     @Test
     public void testAddTaskGetErrorWhenAddNullTask() {
-        NullPointerException ex =
-                Assertions.assertThrows(NullPointerException.class, () -> getTaskManager().addTask(null));
-        Assertions.assertNotNull(ex);
+        TaskValidationException ex =
+                Assertions.assertThrows(TaskValidationException.class, () -> getTaskManager().addTask(null));
+
+        Assertions.assertEquals("Передано null-значение.", ex.getMessage());
     }
 
     // Метод addTask: Тест получения результат -1, если такой id уже есть в менеджере задач
@@ -61,8 +63,11 @@ public abstract class TasksManagerTest<T extends TaskManager> {
         Task task = TestDataUtil.createDefaultTask();
         task.setId(2);
         getTaskManager().addTask(task);
-        int repeatTaskId = getTaskManager().addTask(task);
-        Assertions.assertEquals(-1, repeatTaskId);
+
+        TaskValidationException ex = Assertions.assertThrows(TaskValidationException.class, () ->
+                getTaskManager().addTask(task));
+
+        Assertions.assertEquals("Задача с id=2 уже существует, добавление не произошло.", ex.getMessage());
     }
 
     @Test
@@ -148,8 +153,11 @@ public abstract class TasksManagerTest<T extends TaskManager> {
         task2.setStartTime(LocalDateTime.parse("2023-01-20T13:00"));
 
         getTaskManager().addTask(task1);
-        int id = getTaskManager().addTask(task2);
-        Assertions.assertEquals(-1, id);
+        TaskValidationException ex = Assertions.assertThrows(TaskValidationException.class, () ->
+                getTaskManager().addTask(task2));
+
+        Assertions.assertEquals("Задача имеет пересечение с другими задачами. Добавление не произошло.",
+                ex.getMessage());
     }
 
     // Метод addTask: Не добавляются пересекающие задачи
@@ -165,8 +173,11 @@ public abstract class TasksManagerTest<T extends TaskManager> {
         task2.setStartTime(LocalDateTime.parse("2023-01-20T12:00"));
 
         getTaskManager().addTask(task1);
-        int id = getTaskManager().addTask(task2);
-        Assertions.assertEquals(-1, id);
+        TaskValidationException ex = Assertions.assertThrows(TaskValidationException.class, () ->
+                getTaskManager().addTask(task2));
+
+        Assertions.assertEquals("Задача имеет пересечение с другими задачами. Добавление не произошло.",
+                ex.getMessage());
     }
 
     // Метод addTask: Не добавляются пересекающие задачи
@@ -182,8 +193,11 @@ public abstract class TasksManagerTest<T extends TaskManager> {
         task2.setStartTime(LocalDateTime.parse("2023-01-20T11:30"));
 
         getTaskManager().addTask(task1);
-        int id = getTaskManager().addTask(task2);
-        Assertions.assertEquals(-1, id);
+        TaskValidationException ex = Assertions.assertThrows(TaskValidationException.class, () ->
+                getTaskManager().addTask(task2));
+
+        Assertions.assertEquals("Задача имеет пересечение с другими задачами. Добавление не произошло.",
+                ex.getMessage());
     }
 
     // Метод addTask: Не добавляются пересекающие задачи
@@ -199,8 +213,11 @@ public abstract class TasksManagerTest<T extends TaskManager> {
         task2.setStartTime(LocalDateTime.parse("2023-01-20T12:30"));
 
         getTaskManager().addTask(task1);
-        int id = getTaskManager().addTask(task2);
-        Assertions.assertEquals(-1, id);
+        TaskValidationException ex = Assertions.assertThrows(TaskValidationException.class, () ->
+                getTaskManager().addTask(task2));
+
+        Assertions.assertEquals("Задача имеет пересечение с другими задачами. Добавление не произошло.",
+                ex.getMessage());
     }
 
     // Тест добавления без пересечений разных задач
@@ -250,10 +267,10 @@ public abstract class TasksManagerTest<T extends TaskManager> {
     // Метод addEpic: Тест получения ошибки при попытки сохранить null-значение
     @Test
     public void testAddEpicGetErrorWhenAddNullEpic() {
-        NullPointerException ex = Assertions.assertThrows(NullPointerException.class, () ->
+        TaskValidationException ex = Assertions.assertThrows(TaskValidationException.class, () ->
                 getTaskManager().addEpic(null));
 
-        Assertions.assertNotNull(ex);
+        Assertions.assertEquals("Передано null-значение.", ex.getMessage());
     }
 
     // Метод addEpic: Тест получения результат -1, если такой id в менеджере задач уже есть
@@ -262,8 +279,11 @@ public abstract class TasksManagerTest<T extends TaskManager> {
         Epic epic = TestDataUtil.createDefaultEpicWithOutSubtasks();
         epic.setId(2);
         getTaskManager().addEpic(epic);
-        int repeatTaskId = getTaskManager().addEpic(epic);
-        Assertions.assertEquals(-1, repeatTaskId);
+        TaskValidationException ex = Assertions.assertThrows(TaskValidationException.class, () ->
+                        getTaskManager().addEpic(epic));
+
+        Assertions.assertEquals("Эпик с id=2 уже существует, добавление не произошло.", ex.getMessage());
+
     }
 
     // Проверка вычисления startTime и endTime для Epic с 3 заполненными задачами
@@ -332,27 +352,33 @@ public abstract class TasksManagerTest<T extends TaskManager> {
     // Метод addSubTask: Тест получения ошибки при попытки сохранить null-значение
     @Test
     public void testAddSubTaskGetErrorWhenAddNullSubTask() {
-        NullPointerException ex = Assertions.assertThrows(NullPointerException.class, () ->
+        TaskValidationException ex = Assertions.assertThrows(TaskValidationException.class, () ->
                 getTaskManager().addSubTask(null));
-        Assertions.assertNotNull(ex);
+        Assertions.assertEquals("Передано null-значение.", ex.getMessage());
     }
 
     // Метод addSubTask: Тест получения результат -1, если такой id в менеджере задач уже есть
     @Test
     public void testAddSubTaskGetMinusOneWhenAddRepeatSubTask() {
         SubTask subTask = TestDataUtil.createDefaultSubTaskWithEpic(taskManager);
-        subTask.setId(2);
+        subTask.setId(5);
         getTaskManager().addSubTask(subTask);
-        int repeatTaskId = getTaskManager().addSubTask(subTask);
-        Assertions.assertEquals(-1, repeatTaskId);
+
+        TaskValidationException ex = Assertions.assertThrows(TaskValidationException.class, () ->
+                getTaskManager().addSubTask(subTask));
+
+        Assertions.assertEquals("Подзадача с id=5 уже существует, добавление не произошло.", ex.getMessage());
     }
 
     // Метод addSubTask: Тест не добавления подзадачи, если в менеджере нет данного эпика
     @Test
     public void testAddSubTaskWithOutEpic() {
         SubTask subTask = new SubTask("SubTask1", "SubTask1 By Epic1", Status.NEW, 2);
-        getTaskManager().addSubTask(subTask);
-        Assertions.assertEquals(0, getTaskManager().getSubTasks().size());
+
+        TaskValidationException ex = Assertions.assertThrows(TaskValidationException.class, () ->
+                getTaskManager().addSubTask(subTask));
+
+        Assertions.assertEquals("Нет такого эпика, подзадача не добавилась.", ex.getMessage());
     }
 
     @Test
@@ -569,7 +595,10 @@ public abstract class TasksManagerTest<T extends TaskManager> {
 
     @Test
     public void testNoUpdateTaskWhenNullTask() {
-        getTaskManager().updateTask(null);
+        TaskValidationException ex = Assertions.assertThrows(TaskValidationException.class, () ->
+                getTaskManager().updateTask(null));
+
+        Assertions.assertEquals("Передано null-значение.", ex.getMessage());
         Assertions.assertTrue(getTaskManager().getTasks().isEmpty());
     }
 
@@ -578,9 +607,36 @@ public abstract class TasksManagerTest<T extends TaskManager> {
         Task task = TestDataUtil.createDefaultTask();
         getTaskManager().addTask(task);
         task.setId(101);
-        getTaskManager().updateTask(task);
 
-        Assertions.assertNull(getTaskManager().getTask(101));
+
+        TaskValidationException ex = Assertions.assertThrows(TaskValidationException.class, () ->
+                getTaskManager().updateTask(task));
+
+        Assertions.assertEquals("Обновление невозможно, такая задача не найдена.", ex.getMessage());
+    }
+
+    @Test
+    public void testNoUpdateTaskIntersectTask() {
+        Task task = TestDataUtil.createDefaultTask();
+        task.setDuration(60);
+        task.setStartTime(LocalDateTime.parse("2023-01-20T12:01"));
+        int id = getTaskManager().addTask(task);
+
+        Task task3 = TestDataUtil.createDefaultTask();
+        task3.setDuration(120);
+        task3.setStartTime(LocalDateTime.parse("2023-01-20T13:30"));
+        getTaskManager().addTask(task3);
+
+        Task task2 = TestDataUtil.createDefaultTask();
+        task2.setId(id);
+        task2.setDuration(120);
+        task2.setStartTime(LocalDateTime.parse("2023-01-20T13:00"));
+
+        TaskValidationException ex = Assertions.assertThrows(TaskValidationException.class, () ->
+                getTaskManager().updateTask(task2));
+
+        Assertions.assertEquals("Обновление невозможно," +
+                " так как данная задача пересекается с другой запланированной задачей.", ex.getMessage());
     }
 
     @Test
@@ -658,7 +714,12 @@ public abstract class TasksManagerTest<T extends TaskManager> {
 
     @Test
     public void testNoUpdateEpicWhenNullEpic() {
-        getTaskManager().updateEpic(null);
+        Assertions.assertTrue(getTaskManager().getEpics().isEmpty());
+
+        TaskValidationException ex = Assertions.assertThrows(TaskValidationException.class, () ->
+                getTaskManager().updateEpic(null));
+
+        Assertions.assertEquals("Передано null-значение.", ex.getMessage());
         Assertions.assertTrue(getTaskManager().getEpics().isEmpty());
     }
 
@@ -667,7 +728,11 @@ public abstract class TasksManagerTest<T extends TaskManager> {
         Epic epic = TestDataUtil.createDefaultEpicWithOutSubtasks();
         getTaskManager().addEpic(epic);
         epic.setId(101);
-        getTaskManager().updateEpic(epic);
+
+        TaskValidationException ex = Assertions.assertThrows(TaskValidationException.class, () ->
+                getTaskManager().updateEpic(epic));
+
+        Assertions.assertEquals("Обновление невозможно, такой эпик не найден.", ex.getMessage());
 
         Assertions.assertNull(getTaskManager().getEpic(101));
     }
@@ -690,7 +755,10 @@ public abstract class TasksManagerTest<T extends TaskManager> {
 
     @Test
     public void testNoUpdateSubTaskWhenNullTask() {
-        getTaskManager().updateSubTask(null);
+        TaskValidationException ex = Assertions.assertThrows(TaskValidationException.class, () ->
+                getTaskManager().updateSubTask(null));
+
+        Assertions.assertEquals("Передано null-значение.", ex.getMessage());
         Assertions.assertTrue(getTaskManager().getSubTasks().isEmpty());
     }
 
@@ -699,7 +767,11 @@ public abstract class TasksManagerTest<T extends TaskManager> {
         SubTask subTask = TestDataUtil.createDefaultSubTaskWithEpic(taskManager);
         getTaskManager().addSubTask(subTask);
         subTask.setId(101);
-        getTaskManager().updateSubTask(subTask);
+
+        TaskValidationException ex = Assertions.assertThrows(TaskValidationException.class, () ->
+                getTaskManager().updateSubTask(subTask));
+
+        Assertions.assertEquals("Нет такой сабтаски, подзадача не добавилась.", ex.getMessage());
 
         Assertions.assertNull(getTaskManager().getSubTask(101));
     }
@@ -727,7 +799,12 @@ public abstract class TasksManagerTest<T extends TaskManager> {
         SubTask subTask2 = TestDataUtil.createDefaultSubTaskWithEpic(getTaskManager());
         subTask2.setId(id);
         subTask2.setEpicId(102);
-        getTaskManager().updateSubTask(subTask2);
+
+        TaskValidationException ex = Assertions.assertThrows(TaskValidationException.class, () ->
+                getTaskManager().updateSubTask(subTask2));
+
+        Assertions.assertEquals("Нет эпика подзадачи, подзадача не добавилась.", ex.getMessage());
+
         Assertions.assertEquals(epicId, getTaskManager().getSubTask(id).getEpicId());
 
     }
@@ -773,6 +850,32 @@ public abstract class TasksManagerTest<T extends TaskManager> {
         Assertions.assertNull(task2.getStartTime());
         Assertions.assertNull(task2.getEndTime());
     }
+
+    @Test
+    public void testNoUpdateSubTaskIntersectSubTask() {
+        SubTask subTask = TestDataUtil.createDefaultSubTaskWithEpic(getTaskManager());
+        subTask.setDuration(60);
+        subTask.setStartTime(LocalDateTime.parse("2023-01-20T12:01"));
+        int id = getTaskManager().addSubTask(subTask);
+
+        SubTask task2 = TestDataUtil.createDefaultSubTaskWithEpic(getTaskManager());
+        task2.setDuration(120);
+        task2.setStartTime(LocalDateTime.parse("2023-01-20T13:02"));
+        getTaskManager().addSubTask(task2);
+
+        SubTask task3 = TestDataUtil.createDefaultSubTaskWithEpic(getTaskManager());
+        task3.setId(id);
+        task3.setDuration(120);
+        task3.setStartTime(LocalDateTime.parse("2023-01-20T12:30"));
+
+
+        TaskValidationException ex = Assertions.assertThrows(TaskValidationException.class, () ->
+                getTaskManager().updateSubTask(task3));
+
+        Assertions.assertEquals("Обновление невозможно," +
+                " так как данная задача пересекается с другой запланированной задачей.", ex.getMessage());
+    }
+
         /*
              Тесты на метод  public void removeTaskById(int id);
          */
@@ -787,7 +890,11 @@ public abstract class TasksManagerTest<T extends TaskManager> {
 
     @Test
     public void testRemoveTaskByIdGetNullWhenRemoveNoExistId() {
-        getTaskManager().removeTaskById(102);
+        TaskValidationException ex = Assertions.assertThrows(TaskValidationException.class, () ->
+                getTaskManager().removeTaskById(102));
+
+        Assertions.assertEquals("Нет задачи c id:102.", ex.getMessage());
+
         Assertions.assertNull(taskManager.getTask(102));
     }
         /*
@@ -815,7 +922,11 @@ public abstract class TasksManagerTest<T extends TaskManager> {
 
     @Test
     public void testRemoveEpicByIdGetNullWhenRemoveNoExistId() {
-        getTaskManager().removeEpicById(100);
+        TaskValidationException ex = Assertions.assertThrows(TaskValidationException.class, () ->
+                getTaskManager().removeEpicById(100));
+
+        Assertions.assertEquals("Нет эпика c id:100.", ex.getMessage());
+
         Assertions.assertNull(taskManager.getEpic(100));
     }
 
@@ -918,8 +1029,10 @@ public abstract class TasksManagerTest<T extends TaskManager> {
 
     @Test
     public void testRemoveSubTaskByIdGetNullWhenRemoveNoExistId() {
-        getTaskManager().removeSubTaskById(100);
-        Assertions.assertNull(taskManager.getEpic(100));
+        TaskValidationException ex = Assertions.assertThrows(TaskValidationException.class, () ->
+                getTaskManager().removeSubTaskById(100));
+
+        Assertions.assertEquals("Нет подзадачи c id:100.", ex.getMessage());
     }
 
     /*

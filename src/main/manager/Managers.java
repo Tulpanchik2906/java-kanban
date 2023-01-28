@@ -8,16 +8,16 @@ import main.manager.tasks.TaskManager;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Managers {
 
-    public static TaskManager getDefault(){
-        return new InMemoryTaskManager();
+    public static TaskManager getDefault() throws IOException {
+        Path pathTaskManager = Paths.get("managerState.txt");
+
+        return new FileBackedTasksManager(pathTaskManager);
     }
 
-    public static TaskManager getFileBackedTaskManager(Path path) throws IOException {
-        return new FileBackedTasksManager(path);
-    }
 
     public static HistoryManager getDefaultHistory(){
         return new InMemoryHistoryManager();

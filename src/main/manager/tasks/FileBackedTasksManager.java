@@ -1,5 +1,6 @@
 package main.manager.tasks;
 
+import main.manager.tasks.exception.ManagerSaveException;
 import main.tasks.*;
 
 import java.io.*;
@@ -79,16 +80,16 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 }
 
                 // В менеджер добавляются задачи в зависимости от типа задачи
-                switch (split[1]) {
-                    case "TASK":
+                switch (TaskType.valueOf(split[1])) {
+                    case TASK:
                         Task task = new Task(name, description, id, status, startTime, duration);
                         super.addTask(task);
                         break;
-                    case "EPIC":
+                    case EPIC:
                         Epic epic = new Epic(name, description, id, status);
                         super.addEpic(epic);
                         break;
-                    case "SUBTASK":
+                    case SUBTASK:
                         SubTask subTask = new SubTask(name, description, id, status,
                                 Integer.parseInt(split[7]), startTime, duration);
                         super.addSubTask(subTask);
@@ -99,29 +100,33 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             }
             // Ввостановление истории:
             line = bufferedReader.readLine();
-            if (line == null) {
-                return;
-            }
-            line.trim();
-            String[] splitHistory = line.split(" ");
-            List<String> history = Arrays.asList(splitHistory);
-            Collections.reverse(history);
-            for (String taskId : history) {
-                switch (taskTypes.get(Integer.parseInt(taskId)).name()) {
-                    case "TASK":
-                        super.getTask(Integer.parseInt(taskId));
-                        break;
-                    case "EPIC":
-                        super.getEpic(Integer.parseInt(taskId));
-                        break;
-                    case "SUBTASK":
-                        super.getSubTask(Integer.parseInt(taskId));
-                        break;
-                }
-            }
+            recoveryHistory(line);
         }
     }
 
+    private void recoveryHistory(String line){
+        if (line == null) {
+            return;
+        }
+        line.trim();
+        String[] splitHistory = line.split(" ");
+        List<String> history = Arrays.asList(splitHistory);
+        Collections.reverse(history);
+        for (String taskId : history) {
+            switch ( taskTypes.get(Integer.parseInt(taskId))) {
+                case TASK:
+                    super.getTask(Integer.parseInt(taskId));
+                    break;
+                case EPIC:
+                    super.getEpic(Integer.parseInt(taskId));
+                    break;
+                case SUBTASK:
+                    super.getSubTask(Integer.parseInt(taskId));
+                    break;
+            }
+        }
+
+    }
     private String getFirstStringForSaveInFile() {
         return "id,type,name,status,description,duration,startTime,epic";
     }

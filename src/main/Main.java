@@ -2,6 +2,7 @@ package main;
 
 import main.manager.Managers;
 import main.manager.tasks.FileBackedTasksManager;
+import main.manager.tasks.InMemoryTaskManager;
 import main.manager.tasks.TaskManager;
 import main.tasks.Epic;
 import main.tasks.Status;
@@ -25,7 +26,7 @@ public class Main {
     }
 
     public static void testFirstPracticum() {
-        TaskManager taskManager = Managers.getDefault();
+        TaskManager taskManager = new InMemoryTaskManager();
 
         // Добавление одного эпика с двумя задачами
         Epic epic1 = new Epic("Epic1", "Describe Epic1", Status.NEW);
@@ -58,7 +59,7 @@ public class Main {
     }
 
     public static void testSecondPracticum() {
-        TaskManager taskManager = Managers.getDefault();
+        TaskManager taskManager = new InMemoryTaskManager();
         // Добавление одного эпика с двумя задачами
         Epic epic1 = new Epic("Epic1", "Describe Epic1", Status.NEW);
         taskManager.addEpic(epic1);
@@ -91,7 +92,7 @@ public class Main {
     }
 
     public static void testThreePracticum() {
-        TaskManager taskManager = Managers.getDefault();
+        TaskManager taskManager = new InMemoryTaskManager();
         // Добавление двух задач типа Task
         Task task1 = new Task("Task_1", "Describe Task_1", Status.NEW);
         Task task2 = new Task("Task_2", "Describe Task_2", Status.NEW);
