@@ -20,10 +20,8 @@ public class InMemoryTaskManager implements TaskManager {
     private final HistoryManager historyManager;
     private static int id = 0;
 
-    // new TreeSet<>(Comparator.comparing(Task::getStartTime));
-    // Не взлетело, мб надо как-то дорабатывать метод getStartTime?
-    // Бросает NullPointerException
-    Comparator<Task> comparator = (o1, o2) -> {
+/*
+    Comparator<Task> comparator2 = (o1, o2) -> {
         if (o1.getStartTime() == null) {
             return 1;
         }
@@ -38,6 +36,9 @@ public class InMemoryTaskManager implements TaskManager {
             return 0;
         }
     };
+*/
+    Comparator<Task> comparator = Comparator.comparing(Task::getStartTime,
+            Comparator.nullsLast(Comparator.naturalOrder()));
 
     public InMemoryTaskManager() {
         tasks = new HashMap<>();
