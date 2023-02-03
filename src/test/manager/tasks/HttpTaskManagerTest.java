@@ -19,7 +19,7 @@ public class HttpTaskManagerTest extends TasksManagerTest {
 
     private KVServer kvServer;
     private TaskManager taskManager;
-    private String url = "http://localhost:8080";
+    private String url = "http://localhost:8078";
 
     @BeforeEach
     public void beforeEach() throws IOException {
