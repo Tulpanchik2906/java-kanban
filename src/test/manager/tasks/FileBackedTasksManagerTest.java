@@ -47,7 +47,7 @@ public class FileBackedTasksManagerTest extends TasksManagerTest {
             bufferedWriter.append("id,type,name,status,description,duration,startTime,epic");
             bufferedWriter.newLine();
         }
-        FileBackedTasksManager tasksManagerFromFile = FileBackedTasksManager.loadFromFile(pathTaskManager.toFile());
+        FileBackedTasksManager tasksManagerFromFile = FileBackedTasksManager.load(pathTaskManager.toFile());
         List<Task> list = tasksManagerFromFile.getTasks();
         Assertions.assertTrue(list.isEmpty());
     }
@@ -55,7 +55,7 @@ public class FileBackedTasksManagerTest extends TasksManagerTest {
     @Test
     public void testLoadFromFileGetTasks() throws IOException {
         TestDataUtil.addDefault3Task(getTaskManager());
-        FileBackedTasksManager tasksManagerFromFile = FileBackedTasksManager.loadFromFile(pathTaskManager.toFile());
+        FileBackedTasksManager tasksManagerFromFile = FileBackedTasksManager.load(pathTaskManager.toFile());
         List<Task> list = tasksManagerFromFile.getTasks();
         Assertions.assertEquals(3, list.size());
     }
@@ -63,7 +63,7 @@ public class FileBackedTasksManagerTest extends TasksManagerTest {
     @Test
     public void testLoadFromFileGetEpics() throws IOException {
         TestDataUtil.addDefault3Epics(getTaskManager());
-        FileBackedTasksManager tasksManagerFromFile = FileBackedTasksManager.loadFromFile(pathTaskManager.toFile());
+        FileBackedTasksManager tasksManagerFromFile = FileBackedTasksManager.load(pathTaskManager.toFile());
         List<Epic> list = tasksManagerFromFile.getEpics();
         Assertions.assertEquals(3, list.size());
     }
@@ -72,7 +72,7 @@ public class FileBackedTasksManagerTest extends TasksManagerTest {
     public void testLoadFromFileGetEpicWithOutSubTasks() throws IOException {
         Epic epic = TestDataUtil.createDefaultEpicWithOutSubtasks();
         getTaskManager().addEpic(epic);
-        FileBackedTasksManager tasksManagerFromFile = FileBackedTasksManager.loadFromFile(pathTaskManager.toFile());
+        FileBackedTasksManager tasksManagerFromFile = FileBackedTasksManager.load(pathTaskManager.toFile());
         List<Epic> list = tasksManagerFromFile.getEpics();
         Assertions.assertEquals(1, list.size());
     }
@@ -80,7 +80,7 @@ public class FileBackedTasksManagerTest extends TasksManagerTest {
     @Test
     public void testLoadFromFileGetSubTasks() throws IOException {
         TestDataUtil.addDefault1EpicWith3SubTask(getTaskManager());
-        FileBackedTasksManager tasksManagerFromFile = FileBackedTasksManager.loadFromFile(pathTaskManager.toFile());
+        FileBackedTasksManager tasksManagerFromFile = FileBackedTasksManager.load(pathTaskManager.toFile());
         List<SubTask> list = tasksManagerFromFile.getSubTasks();
         Assertions.assertEquals(3, list.size());
     }
@@ -88,20 +88,22 @@ public class FileBackedTasksManagerTest extends TasksManagerTest {
     @Test
     public void testLoadFromFileEmptyHistory() throws IOException {
         TestDataUtil.addDefault3Task(getTaskManager());
-        FileBackedTasksManager tasksManagerFromFile = FileBackedTasksManager.loadFromFile(pathTaskManager.toFile());
-        List<Task> list = getTaskManager().getHistory();
+        FileBackedTasksManager tasksManagerFromFile = FileBackedTasksManager.load(pathTaskManager.toFile());
+        List<Task> list = tasksManagerFromFile.getHistory();
         Assertions.assertTrue(list.isEmpty());
     }
 
     @Test
     public void testLoadFromFileGetHistory() throws IOException {
         TestDataUtil.addDefault3Task(getTaskManager());
-        FileBackedTasksManager tasksManagerFromFile = FileBackedTasksManager.loadFromFile(pathTaskManager.toFile());
-        List<Task> list = tasksManagerFromFile.getTasks();
+        List<Task> list = getTaskManager().getHistory();
         for (Task task : list) {
             getTaskManager().getTask(task.getId());
         }
-        List<Task> history = getTaskManager().getHistory();
+        FileBackedTasksManager tasksManagerFromFile
+                = FileBackedTasksManager.load(pathTaskManager.toFile());
+
+        List<Task> history = tasksManagerFromFile.getTasks();
         Assertions.assertEquals(3, history.size());
     }
 

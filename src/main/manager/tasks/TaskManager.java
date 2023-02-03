@@ -1,7 +1,6 @@
 package main.manager.tasks;
 
 
-import main.manager.tasks.exception.TaskValidationException;
 import main.tasks.Epic;
 import main.tasks.SubTask;
 import main.tasks.Task;

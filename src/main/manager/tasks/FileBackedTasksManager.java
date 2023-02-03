@@ -21,19 +21,28 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         super();
         if (!Files.exists(path)) {
             this.path = Files.createFile(path);
-        }else {
+        } else {
             this.path = path;
         }
         taskTypes = new HashMap<>();
     }
 
-    public static FileBackedTasksManager loadFromFile(File file) throws IOException {
+    public FileBackedTasksManager() throws IOException {
+        super();
+        path = null;
+        taskTypes = new HashMap<>();
+    }
+
+
+    public static FileBackedTasksManager load(File file) throws IOException {
         FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager(file.toPath());
-        fileBackedTasksManager.loadFromFile(file.toPath());
+        String res = fileBackedTasksManager.getStringForLoad();
+        fileBackedTasksManager.load(res);
         return fileBackedTasksManager;
     }
 
-    private void save() {
+    protected void save() {
+        /*
         try (BufferedWriter bufferedWriter = new BufferedWriter(
                 new FileWriter(path.toFile().getName(), StandardCharsets.UTF_8))) {
             bufferedWriter.append(getFirstStringForSaveInFile());
@@ -45,10 +54,17 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             bufferedWriter.append(getHistoryString());
         } catch (IOException ex) {
             throw new ManagerSaveException(ex.getMessage());
+        }*/
+        try (BufferedWriter bufferedWriter = new BufferedWriter(
+                new FileWriter(path.toFile().getName(), StandardCharsets.UTF_8))) {
+            bufferedWriter.append(getStringForSave());
+        } catch (IOException ex) {
+            throw new ManagerSaveException(ex.getMessage());
         }
+
     }
 
-    private void loadFromFile(Path path) throws IOException {
+    private void loadFromFile2(Path path) throws IOException {
         // Парсится содержимое файла
         try (BufferedReader bufferedReader = new BufferedReader(
                 new FileReader(path.toFile().getName(), StandardCharsets.UTF_8))) {
@@ -104,8 +120,106 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    private void recoveryHistory(String line){
-        if (line == null) {
+    private String getStringForLoad() throws IOException {
+        // Парсится содержимое файла
+        try (BufferedReader bufferedReader = new BufferedReader(
+                new FileReader(path.toFile().getName(), StandardCharsets.UTF_8))) {
+            // Восстанавливаем задачи
+            // Читается первая строка с названием колонок
+            String lineFirst = bufferedReader.readLine() + "\n";
+            // Первая строка с задачей
+            String lineSecond = bufferedReader.readLine();
+            // Если задач нет, то выйти из метода
+            if (lineSecond == null || lineSecond.trim().isEmpty()) {
+                return lineFirst;
+            }
+            // Читаются строки пока не будет пустая строка (строка до строки с историей)
+            while (!lineSecond.trim().isEmpty()) {
+                lineFirst += lineSecond + "\n";
+                lineSecond = bufferedReader.readLine();
+            }
+            // Ввостановление истории:
+            lineFirst += "\n";
+
+            lineSecond = bufferedReader.readLine();
+            if (lineSecond != null) {
+                lineFirst += lineSecond;
+            } else {
+                lineFirst += "\n";
+            }
+
+            return lineFirst;
+        }
+    }
+
+    protected void load(String str) throws IOException {
+
+        String splitStrings[] = str.split("\n");
+
+        // Восстанавливаем задачи
+        // Читается первая строка с названием колонок
+        String line = splitStrings[0];
+        // Первая строка с задачей
+        if (splitStrings.length > 1) {
+            line = splitStrings[1];
+        }else{
+            return;
+        }
+        // Если задач нет, то выйти из метода
+        if (line == null || line.trim().isEmpty()) {
+            return;
+        }
+        int index = 1;
+        // Читаются строки пока не будет пустая строка (строка до строки с историей)
+        while (!line.trim().isEmpty()) {
+            String[] split = line.split(",");
+
+            // id,type,name,status,description,epic
+            int id = Integer.parseInt(split[0]);
+            String name = split[2];
+            Status status = Status.valueOf(split[3]);
+            String description = split[4];
+            int duration = 0;
+            if (!split[5].trim().isEmpty()) {
+                duration = Integer.parseInt(split[5]);
+            }
+            LocalDateTime startTime = null;
+            if (!split[6].trim().isEmpty()) {
+                startTime = LocalDateTime.parse(split[6], DATE_TIME_FORMATTER);
+            }
+
+            // В менеджер добавляются задачи в зависимости от типа задачи
+            switch (TaskType.valueOf(split[1])) {
+                case TASK:
+                    Task task = new Task(name, description, id, status, startTime, duration);
+                    super.addTask(task);
+                    break;
+                case EPIC:
+                    Epic epic = new Epic(name, description, id, status);
+                    super.addEpic(epic);
+                    break;
+                case SUBTASK:
+                    SubTask subTask = new SubTask(name, description, id, status,
+                            Integer.parseInt(split[7]), startTime, duration);
+                    super.addSubTask(subTask);
+            }
+
+            taskTypes.put(id, TaskType.valueOf(split[1]));
+            if (index + 1 < splitStrings.length) {
+                index++;
+                line = splitStrings[index];
+            } else {
+                return;
+            }
+        }
+        // Ввостановление истории:
+        line = splitStrings[index + 1];
+        recoveryHistory(line);
+    }
+
+
+    private void recoveryHistory(String line) {
+        if (line == null || line.trim().isEmpty()) {
             return;
         }
         line.trim();
@@ -113,7 +227,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         List<String> history = Arrays.asList(splitHistory);
         Collections.reverse(history);
         for (String taskId : history) {
-            switch ( taskTypes.get(Integer.parseInt(taskId))) {
+            switch (taskTypes.get(Integer.parseInt(taskId))) {
                 case TASK:
                     super.getTask(Integer.parseInt(taskId));
                     break;
@@ -127,6 +241,26 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
 
     }
+
+    protected String getStringForSave() {
+        String ans = getFirstStringForSaveInFile() + "\n";
+        List<Task> tasks = getTasks();
+        for (Task task : tasks) {
+            ans += getTaskStringForSaveInFile(task) + "\n";
+        }
+        List<Epic> epics = getEpics();
+        for (Epic epic : epics) {
+            ans += getEpicStringForSaveInFile(epic) + "\n";
+        }
+        List<SubTask> subTasks = getSubTasks();
+        for (SubTask subTask : subTasks) {
+            ans += getSubTaskStringForSaveInFile(subTask) + "\n";
+        }
+        ans += "\n";
+        ans += getHistoryString();
+        return ans;
+    }
+
     private String getFirstStringForSaveInFile() {
         return "id,type,name,status,description,duration,startTime,epic";
     }

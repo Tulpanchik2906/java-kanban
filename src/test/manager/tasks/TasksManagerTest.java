@@ -280,7 +280,7 @@ public abstract class TasksManagerTest<T extends TaskManager> {
         epic.setId(2);
         getTaskManager().addEpic(epic);
         TaskValidationException ex = Assertions.assertThrows(TaskValidationException.class, () ->
-                        getTaskManager().addEpic(epic));
+                getTaskManager().addEpic(epic));
 
         Assertions.assertEquals("Эпик с id=2 уже существует, добавление не произошло.", ex.getMessage());
 

@@ -8,7 +8,6 @@ import main.tasks.Status;
 import main.tasks.SubTask;
 import main.tasks.Task;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -20,8 +19,8 @@ public class InMemoryTaskManager implements TaskManager {
     private final HistoryManager historyManager;
     private static int id = 0;
 
-/*
-    Comparator<Task> comparator2 = (o1, o2) -> {
+
+    Comparator<Task> comparator = (o1, o2) -> {
         if (o1.getStartTime() == null) {
             return 1;
         }
@@ -36,10 +35,11 @@ public class InMemoryTaskManager implements TaskManager {
             return 0;
         }
     };
-*/
+
+/*
     Comparator<Task> comparator = Comparator.comparing(Task::getStartTime,
             Comparator.nullsLast(Comparator.naturalOrder()));
-
+*/
     public InMemoryTaskManager() {
         tasks = new HashMap<>();
         subTasks = new HashMap<>();
@@ -382,6 +382,12 @@ public class InMemoryTaskManager implements TaskManager {
                     return true;
                 }
                 if (task.getEndTime().isEqual(newTask.getStartTime())) {
+                    return true;
+                }
+                if (task.getStartTime().isEqual(newTask.getStartTime())) {
+                    return true;
+                }
+                if (task.getEndTime().isEqual(newTask.getEndTime())) {
                     return true;
                 }
                 if (newTask.getStartTime().isBefore(task.getStartTime())

@@ -1,9 +1,10 @@
 package main;
 
-import main.manager.Managers;
 import main.manager.tasks.FileBackedTasksManager;
 import main.manager.tasks.InMemoryTaskManager;
 import main.manager.tasks.TaskManager;
+import main.servers.kvserver.KVServer;
+import main.servers.kvserver.KVTaskClient;
 import main.tasks.Epic;
 import main.tasks.Status;
 import main.tasks.SubTask;
@@ -18,8 +19,11 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) throws IOException {
+        KVServer kvServer = new KVServer();
+        kvServer.start();
         System.out.println("Поехали!");
         testFourPracticum();
+        kvServer.stop();
         //testThreePracticum();
         //testSecondPracticum();
         //testFirstPracticum();
@@ -182,10 +186,10 @@ public class Main {
         System.out.println("После добавления 2-х задач типа Task и одного Epic с 3-мя SubTask:");
         printHistory(taskManager.getHistory());
 
-        FileBackedTasksManager tasksManagerFromFile = FileBackedTasksManager.loadFromFile(path.toFile());
+        FileBackedTasksManager tasksManagerFromFile = FileBackedTasksManager.load(path.toFile());
         // восстановление менеджера
         System.out.println("Состояние после восстановления:");
-        tasksManagerFromFile = FileBackedTasksManager.loadFromFile(path.toFile());
+        tasksManagerFromFile = FileBackedTasksManager.load(path.toFile());
         printHistory(tasksManagerFromFile.getHistory());
 
         System.out.println("Тестирование повтора задачи типа Task.");
@@ -198,7 +202,7 @@ public class Main {
         printHistory(taskManager.getHistory());
 
         System.out.println("Состояние после восстановления:");
-        tasksManagerFromFile = FileBackedTasksManager.loadFromFile(path.toFile());
+        tasksManagerFromFile = FileBackedTasksManager.load(path.toFile());
         printHistory(tasksManagerFromFile.getHistory());
 
         // Тестирование повтора задачи типа Epic
@@ -211,7 +215,7 @@ public class Main {
         printHistory(taskManager.getHistory());
 
         System.out.println("Состояние после восстановления:");
-        tasksManagerFromFile = FileBackedTasksManager.loadFromFile(path.toFile());
+        tasksManagerFromFile = FileBackedTasksManager.load(path.toFile());
         printHistory(tasksManagerFromFile.getHistory());
 
         // Тестирование повтора задачи типа SubTask
@@ -224,7 +228,7 @@ public class Main {
         printHistory(taskManager.getHistory());
 
         System.out.println("Состояние после восстановления:");
-        tasksManagerFromFile = FileBackedTasksManager.loadFromFile(path.toFile());
+        tasksManagerFromFile = FileBackedTasksManager.load(path.toFile());
         printHistory(tasksManagerFromFile.getHistory());
 
         //Проверка удаления одной задачи типа Task
@@ -233,7 +237,7 @@ public class Main {
         printHistory(taskManager.getHistory());
 
         System.out.println("Состояние после восстановления:");
-        tasksManagerFromFile = FileBackedTasksManager.loadFromFile(path.toFile());
+        tasksManagerFromFile = FileBackedTasksManager.load(path.toFile());
         printHistory(tasksManagerFromFile.getHistory());
 
         //Проверка удаления одной задачи типа SubTask
@@ -242,7 +246,7 @@ public class Main {
         printHistory(taskManager.getHistory());
 
         System.out.println("Состояние после восстановления:");
-        tasksManagerFromFile = FileBackedTasksManager.loadFromFile(path.toFile());
+        tasksManagerFromFile = FileBackedTasksManager.load(path.toFile());
         printHistory(tasksManagerFromFile.getHistory());
 
         //Проверка удаления одной задачи типа Epic
@@ -251,7 +255,7 @@ public class Main {
         printHistory(taskManager.getHistory());
 
         System.out.println("Состояние после восстановления:");
-        tasksManagerFromFile = FileBackedTasksManager.loadFromFile(path.toFile());
+        tasksManagerFromFile = FileBackedTasksManager.load(path.toFile());
         printHistory(tasksManagerFromFile.getHistory());
 
         // Проверка добавления задачи типа Task после удаления
@@ -261,7 +265,7 @@ public class Main {
         printHistory(taskManager.getHistory());
 
         System.out.println("Состояние после восстановления:");
-        tasksManagerFromFile = FileBackedTasksManager.loadFromFile(path.toFile());
+        tasksManagerFromFile = FileBackedTasksManager.load(path.toFile());
         printHistory(tasksManagerFromFile.getHistory());
 
         // Удаление файла после теста

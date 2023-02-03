@@ -1,0 +1,26 @@
+package main.servers.httptaskserver.enums;
+
+public enum EndpointTasks {
+    GET_TASKS,
+    GET_TASK_BY_ID,
+    POST_TASK,
+    PUT_TASK,
+    DELETE_TASKS,
+    DELETE_TASK_BY_ID,
+    GET_EPICS,
+    GET_EPIC_BY_ID,
+    POST_EPIC,
+    PUT_EPIC,
+    DELETE_EPICS,
+    DELETE_EPIC_BY_ID,
+    GET_SUBTASKS,
+    GET_SUBTASK_BY_ID,
+    POST_SUBTASK,
+    PUT_SUBTASK,
+    DELETE_SUBTASKS,
+    DELETE_SUBTASK_BY_ID,
+    GET_SUBTASK_BY_EPIC_ID,
+    GET_PRIORITIZED_TASK,
+    GET_HISTORY,
+    UNKNOWN
+}

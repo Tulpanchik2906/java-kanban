@@ -3,6 +3,7 @@ package main.manager;
 import main.manager.history.HistoryManager;
 import main.manager.history.InMemoryHistoryManager;
 import main.manager.tasks.FileBackedTasksManager;
+import main.manager.tasks.HttpTaskManager;
 import main.manager.tasks.InMemoryTaskManager;
 import main.manager.tasks.TaskManager;
 
@@ -13,9 +14,8 @@ import java.nio.file.Paths;
 public class Managers {
 
     public static TaskManager getDefault() throws IOException {
-        Path pathTaskManager = Paths.get("managerState.txt");
-
-        return new FileBackedTasksManager(pathTaskManager);
+        String url = "http://localhost:8078";
+        return new HttpTaskManager(url);
     }
 
 
