@@ -109,7 +109,7 @@ public class KVServer {
 	}
 
 	public void stop() {
-		server.stop(1);
+		server.stop(0);
 	}
 
 	private String generateApiToken() {

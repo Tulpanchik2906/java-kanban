@@ -19,7 +19,7 @@ public class InMemoryTaskManager implements TaskManager {
     private final HistoryManager historyManager;
     private static int id = 0;
 
-
+/*
     Comparator<Task> comparator = (o1, o2) -> {
         if (o1.getStartTime() == null) {
             return 1;
@@ -36,10 +36,10 @@ public class InMemoryTaskManager implements TaskManager {
         }
     };
 
-/*
-    Comparator<Task> comparator = Comparator.comparing(Task::getStartTime,
-            Comparator.nullsLast(Comparator.naturalOrder()));
 */
+    Comparator<Task> comparator = Comparator.comparing(Task::getStartTime,
+            Comparator.nullsLast(Comparator.naturalOrder())).thenComparing(Task::getId);
+
     public InMemoryTaskManager() {
         tasks = new HashMap<>();
         subTasks = new HashMap<>();
