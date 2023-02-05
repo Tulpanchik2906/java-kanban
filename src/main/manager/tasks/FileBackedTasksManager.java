@@ -27,7 +27,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         taskTypes = new HashMap<>();
     }
 
-    public FileBackedTasksManager() throws IOException {
+    public FileBackedTasksManager(){
         super();
         path = null;
         taskTypes = new HashMap<>();
@@ -64,105 +64,45 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     }
 
-    private void loadFromFile2(Path path) throws IOException {
-        // Парсится содержимое файла
-        try (BufferedReader bufferedReader = new BufferedReader(
-                new FileReader(path.toFile().getName(), StandardCharsets.UTF_8))) {
-            // Восстанавливаем задачи
-            // Читается первая строка с названием колонок
-            String line = bufferedReader.readLine();
-            // Первая строка с задачей
-            line = bufferedReader.readLine();
-            // Если задач нет, то выйти из метода
-            if (line == null || line.trim().isEmpty()) {
-                return;
-            }
-            // Читаются строки пока не будет пустая строка (строка до строки с историей)
-            while (!line.trim().isEmpty()) {
-                String[] split = line.split(",");
-
-                // id,type,name,status,description,epic
-                int id = Integer.parseInt(split[0]);
-                String name = split[2];
-                Status status = Status.valueOf(split[3]);
-                String description = split[4];
-                int duration = 0;
-                if (!split[5].trim().isEmpty()) {
-                    duration = Integer.parseInt(split[5]);
-                }
-                LocalDateTime startTime = null;
-                if (!split[6].trim().isEmpty()) {
-                    startTime = LocalDateTime.parse(split[6], DATE_TIME_FORMATTER);
-                }
-
-                // В менеджер добавляются задачи в зависимости от типа задачи
-                switch (TaskType.valueOf(split[1])) {
-                    case TASK:
-                        Task task = new Task(name, description, id, status, startTime, duration);
-                        super.addTask(task);
-                        break;
-                    case EPIC:
-                        Epic epic = new Epic(name, description, id, status);
-                        super.addEpic(epic);
-                        break;
-                    case SUBTASK:
-                        SubTask subTask = new SubTask(name, description, id, status,
-                                Integer.parseInt(split[7]), startTime, duration);
-                        super.addSubTask(subTask);
-                }
-
-                taskTypes.put(id, TaskType.valueOf(split[1]));
-                line = bufferedReader.readLine();
-            }
-            // Ввостановление истории:
-            line = bufferedReader.readLine();
-            recoveryHistory(line);
-        }
-    }
-
     private String getStringForLoad() throws IOException {
         // Парсится содержимое файла
         try (BufferedReader bufferedReader = new BufferedReader(
                 new FileReader(path.toFile().getName(), StandardCharsets.UTF_8))) {
             // Восстанавливаем задачи
             // Читается первая строка с названием колонок
-            String lineFirst = bufferedReader.readLine() + "\n";
+            StringBuilder lineFirst = new StringBuilder(bufferedReader.readLine() + "\n");
             // Первая строка с задачей
             String lineSecond = bufferedReader.readLine();
             // Если задач нет, то выйти из метода
             if (lineSecond == null || lineSecond.trim().isEmpty()) {
-                return lineFirst;
+                return lineFirst.toString();
             }
             // Читаются строки пока не будет пустая строка (строка до строки с историей)
             while (!lineSecond.trim().isEmpty()) {
-                lineFirst += lineSecond + "\n";
+                lineFirst.append(lineSecond).append("\n");
                 lineSecond = bufferedReader.readLine();
             }
             // Ввостановление истории:
-            lineFirst += "\n";
+            lineFirst.append("\n");
 
             lineSecond = bufferedReader.readLine();
-            if (lineSecond != null) {
-                lineFirst += lineSecond;
-            } else {
-                lineFirst += "\n";
-            }
+            lineFirst.append(Objects.requireNonNullElse(lineSecond, "\n"));
 
-            return lineFirst;
+            return lineFirst.toString();
         }
     }
 
-    protected void load(String str) throws IOException {
+    protected void load(String str) {
 
-        String splitStrings[] = str.split("\n");
+        String[] splitStrings = str.split("\n");
 
         // Восстанавливаем задачи
-        // Читается первая строка с названием колонок
-        String line = splitStrings[0];
+        // Пропускается первая строка с названием колонок
+        String line;
         // Первая строка с задачей
         if (splitStrings.length > 1) {
             line = splitStrings[1];
-        }else{
+        } else {
             return;
         }
         // Если задач нет, то выйти из метода
@@ -222,7 +162,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         if (line == null || line.trim().isEmpty()) {
             return;
         }
-        line.trim();
         String[] splitHistory = line.split(" ");
         List<String> history = Arrays.asList(splitHistory);
         Collections.reverse(history);
@@ -243,22 +182,22 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     protected String getStringForSave() {
-        String ans = getFirstStringForSaveInFile() + "\n";
+        StringBuilder ans = new StringBuilder(getFirstStringForSaveInFile() + "\n");
         List<Task> tasks = getTasks();
         for (Task task : tasks) {
-            ans += getTaskStringForSaveInFile(task) + "\n";
+            ans.append(getTaskStringForSaveInFile(task)).append("\n");
         }
         List<Epic> epics = getEpics();
         for (Epic epic : epics) {
-            ans += getEpicStringForSaveInFile(epic) + "\n";
+            ans.append(getEpicStringForSaveInFile(epic)).append("\n");
         }
         List<SubTask> subTasks = getSubTasks();
         for (SubTask subTask : subTasks) {
-            ans += getSubTaskStringForSaveInFile(subTask) + "\n";
+            ans.append(getSubTaskStringForSaveInFile(subTask)).append("\n");
         }
-        ans += "\n";
-        ans += getHistoryString();
-        return ans;
+        ans.append("\n");
+        ans.append(getHistoryString());
+        return ans.toString();
     }
 
     private String getFirstStringForSaveInFile() {
@@ -298,38 +237,14 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return startTime;
     }
 
-    private void saveTasks(BufferedWriter bufferedWriter) throws IOException {
-        List<Task> tasks = getTasks();
-        for (Task task : tasks) {
-            bufferedWriter.append(getTaskStringForSaveInFile(task));
-            bufferedWriter.newLine();
-        }
-    }
-
-    private void saveEpics(BufferedWriter bufferedWriter) throws IOException {
-        List<Epic> epics = getEpics();
-        for (Epic epic : epics) {
-            bufferedWriter.append(getEpicStringForSaveInFile(epic));
-            bufferedWriter.newLine();
-        }
-    }
-
-    private void saveSubTasks(BufferedWriter bufferedWriter) throws IOException {
-        List<SubTask> subTasks = getSubTasks();
-        for (SubTask subTask : subTasks) {
-            bufferedWriter.append(getSubTaskStringForSaveInFile(subTask));
-            bufferedWriter.newLine();
-        }
-    }
 
     private String getHistoryString() {
         List<Task> history = getHistory();
-        String res = "";
+        StringBuilder res = new StringBuilder();
         for (int i = history.size() - 1; i >= 0; i--) {
-            res += history.get(i).getId() + " ";
+            res.append(history.get(i).getId()).append(" ");
         }
-        res.trim();
-        return res;
+        return res.toString();
     }
 
     @Override

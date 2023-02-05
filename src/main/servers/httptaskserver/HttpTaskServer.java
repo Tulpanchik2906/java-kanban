@@ -9,7 +9,6 @@ import main.manager.tasks.TaskManager;
 import main.servers.httptaskserver.enums.EndpointTasks;
 import main.servers.httptaskserver.enums.RequestMethod;
 import main.tasks.Epic;
-import main.tasks.Status;
 import main.tasks.SubTask;
 import main.tasks.Task;
 
@@ -28,7 +27,7 @@ public class HttpTaskServer {
 
     private final Gson gson;
 
-    public HttpTaskServer() throws IOException {
+    public HttpTaskServer() throws IOException, InterruptedException {
         taskManager = Managers.getDefault();
         gson = new Gson();
     }

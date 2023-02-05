@@ -8,16 +8,20 @@ import java.net.http.HttpResponse;
 
 public class KVTaskClient {
 
-    private HttpClient httpClient;
-    private HttpResponse.BodyHandler<String> handler;
-    private String url;
-    public KVTaskClient(String url){
+    private final HttpClient httpClient;
+    private final HttpResponse.BodyHandler<String> handler;
+    private final String url;
+    private final String API_TOKEN;
+
+    public KVTaskClient(String url) throws IOException, InterruptedException {
         httpClient = HttpClient.newHttpClient();
         handler = HttpResponse.BodyHandlers.ofString();
         this.url = url;
+        API_TOKEN = getApiToken();
     }
-    public String getApiToken() throws IOException, InterruptedException {
-        URI uri = URI.create(url+"/register");
+
+    private String getApiToken() throws IOException, InterruptedException {
+        URI uri = URI.create(url + "/register");
 
         HttpRequest request = HttpRequest.newBuilder()
                 .GET()
@@ -30,10 +34,10 @@ public class KVTaskClient {
         return response.body();
     }
 
-    public void save(String apiToken, String key, String body) throws IOException, InterruptedException {
-        URI uri = URI.create(url+"/save/"+key+"?API_TOKEN="+apiToken);
+    public void put(String key, String json) throws IOException, InterruptedException {
+        URI uri = URI.create(url + "/save/" + key + "?API_TOKEN=" + API_TOKEN);
 
-        HttpRequest.BodyPublisher bodyPublisher = HttpRequest.BodyPublishers.ofString(body);
+        HttpRequest.BodyPublisher bodyPublisher = HttpRequest.BodyPublishers.ofString(json);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .POST(bodyPublisher)
@@ -41,12 +45,12 @@ public class KVTaskClient {
                 .build();
 
 
-        HttpResponse<String> response = httpClient.send(request, handler);
+        httpClient.send(request, handler);
 
     }
 
-    public String  load(String apiToken, String key) throws IOException, InterruptedException {
-        URI uri = URI.create(url+"/load/"+key+"?API_TOKEN="+apiToken);
+    public String load(String key) throws IOException, InterruptedException {
+        URI uri = URI.create(url + "/load/" + key + "?API_TOKEN=" + API_TOKEN);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .GET()

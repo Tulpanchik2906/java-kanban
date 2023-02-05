@@ -1,41 +1,31 @@
 package main.manager.tasks;
 
+import main.manager.tasks.exception.ManagerSaveException;
 import main.servers.kvserver.KVTaskClient;
 
 import java.io.IOException;
-import java.nio.file.Path;
 
-public class HttpTaskManager extends FileBackedTasksManager{
+public class HttpTaskManager extends FileBackedTasksManager {
 
-    private KVTaskClient kvTaskClient;
-    private String url;
+    private final KVTaskClient kvTaskClient;
 
-    private HttpTaskManager(Path path) throws IOException {
-        super(path);
-    }
-
-    public HttpTaskManager(String url) throws IOException {
+    public HttpTaskManager(String url) throws IOException, InterruptedException {
         super();
-        this.url = url;
         kvTaskClient = new KVTaskClient(url);
     }
 
     @Override
-    protected void save(){
+    protected void save() {
         try {
-            String apiToken = kvTaskClient.getApiToken();
-            System.out.println("Вызыван метод save: " );
-            System.out.println("Текущий токен: " +apiToken);
-            kvTaskClient.save(apiToken.trim(), "1", super.getStringForSave());
-        } catch (Exception ex){
-
+            kvTaskClient.put("data", super.getStringForSave());
+        } catch (InterruptedException | IOException ex) {
+            throw new ManagerSaveException(ex.getMessage());
         }
     }
 
 
-    public void loadFromServer() throws IOException, InterruptedException {
-        String apiToken = kvTaskClient.getApiToken();
-        String res = kvTaskClient.load(apiToken,"1");
+    private void loadFromServer() throws IOException, InterruptedException {
+        String res = kvTaskClient.load("data");
         super.load(res);
     }
 

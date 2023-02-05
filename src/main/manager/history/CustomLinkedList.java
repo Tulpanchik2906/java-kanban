@@ -2,7 +2,10 @@ package main.manager.history;
 
 import main.tasks.Task;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CustomLinkedList<T extends Task> {
     class Node<E extends Task> {
@@ -40,7 +43,7 @@ public class CustomLinkedList<T extends Task> {
 
     public void linkLast(T element) {
         // Если элемент null
-        if(element == null){
+        if (element == null) {
             return;
         }
         // Если эту задачу уже просматривали, то надо ее сначала удалить

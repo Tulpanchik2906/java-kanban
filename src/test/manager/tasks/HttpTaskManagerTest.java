@@ -19,10 +19,10 @@ public class HttpTaskManagerTest extends TasksManagerTest {
 
     private KVServer kvServer;
     private TaskManager taskManager;
-    private String url = "http://localhost:8078";
+    private final String url = "http://localhost:8078";
 
     @BeforeEach
-    public void beforeEach() throws IOException {
+    public void beforeEach() throws IOException, InterruptedException {
         kvServer = new KVServer();
         kvServer.start();
         taskManager = new HttpTaskManager(url);
@@ -31,7 +31,7 @@ public class HttpTaskManagerTest extends TasksManagerTest {
     }
 
     @AfterEach
-    public void afterEach() throws IOException {
+    public void afterEach() {
         kvServer.stop();
     }
 

@@ -19,24 +19,6 @@ public class InMemoryTaskManager implements TaskManager {
     private final HistoryManager historyManager;
     private static int id = 0;
 
-/*
-    Comparator<Task> comparator = (o1, o2) -> {
-        if (o1.getStartTime() == null) {
-            return 1;
-        }
-        if (o2.getStartTime() == null) {
-            return -1;
-        }
-        if (o1.getStartTime().isBefore(o2.getStartTime())) {
-            return -1;
-        } else if (o1.getStartTime().isAfter(o2.getStartTime())) {
-            return 1;
-        } else {
-            return 0;
-        }
-    };
-
-*/
     Comparator<Task> comparator = Comparator.comparing(Task::getStartTime,
             Comparator.nullsLast(Comparator.naturalOrder())).thenComparing(Task::getId);
 
@@ -56,7 +38,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public int addTask(Task task) {
-        if(task == null){
+        if (task == null) {
             throw new TaskValidationException("Передано null-значение.");
         }
         // Проверяем можено ли добавить задачу без пересечения с другими задачами
@@ -80,7 +62,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public int addEpic(Epic epic) {
-        if(epic == null){
+        if (epic == null) {
             throw new TaskValidationException("Передано null-значение.");
         }
         // Проверка есть ли такой номер в менеджере задач
@@ -103,7 +85,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public int addSubTask(SubTask subTask) {
-        if(subTask == null){
+        if (subTask == null) {
             throw new TaskValidationException("Передано null-значение.");
         }
         // Проверяем, что эпик для сабтаски есть, иначе не добавляем сабтаску
@@ -194,23 +176,17 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Task> getTasks() {
-        ArrayList<Task> list = new ArrayList<>();
-        list.addAll(tasks.values());
-        return list;
+        return new ArrayList<>(tasks.values());
     }
 
     @Override
     public List<Epic> getEpics() {
-        ArrayList<Epic> list = new ArrayList<>();
-        list.addAll(epics.values());
-        return list;
+        return new ArrayList<>(epics.values());
     }
 
     @Override
     public List<SubTask> getSubTasks() {
-        ArrayList<SubTask> list = new ArrayList<>();
-        list.addAll(subTasks.values());
-        return list;
+        return new ArrayList<>(subTasks.values());
     }
 
     @Override
@@ -308,7 +284,7 @@ public class InMemoryTaskManager implements TaskManager {
             tasks.remove(id);
             historyManager.remove(id);
         } else {
-            throw new TaskValidationException("Нет задачи c id:" +id +".");
+            throw new TaskValidationException("Нет задачи c id:" + id + ".");
         }
     }
 
@@ -325,7 +301,7 @@ public class InMemoryTaskManager implements TaskManager {
             epics.remove(id);
             historyManager.remove(id);
         } else {
-            throw new TaskValidationException("Нет эпика c id:" +id +".");
+            throw new TaskValidationException("Нет эпика c id:" + id + ".");
         }
     }
 
@@ -342,7 +318,7 @@ public class InMemoryTaskManager implements TaskManager {
             subTasks.remove(id);
             historyManager.remove(id);
         } else {
-            throw new TaskValidationException("Нет подзадачи c id:" +id +".");
+            throw new TaskValidationException("Нет подзадачи c id:" + id + ".");
         }
     }
 
@@ -410,7 +386,7 @@ public class InMemoryTaskManager implements TaskManager {
             return null;
         }
 
-        Collections.sort(subTaskList, comparator);
+        subTaskList.sort(comparator);
         return subTaskList.get(0).getStartTime();
     }
 

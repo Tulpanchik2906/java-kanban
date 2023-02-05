@@ -7,8 +7,6 @@ import test.TestDataUtil;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 public class TaskTest {
 
     @Test
@@ -22,6 +20,6 @@ public class TaskTest {
     @Test
     void testGetEndTimeWhenNullStartTime() {
         Task task = TestDataUtil.createDefaultTask();
-        Assertions.assertNull( task.getEndTime());
+        Assertions.assertNull(task.getEndTime());
     }
 }
