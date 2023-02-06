@@ -31,7 +31,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
 
-    public static int generateNewId() {
+    private int generateNewId() {
         id++;
         return id;
     }

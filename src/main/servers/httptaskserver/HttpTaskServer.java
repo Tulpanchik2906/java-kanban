@@ -168,8 +168,8 @@ public class HttpTaskServer {
             InputStream inputStream = httpExchange.getRequestBody();
             String taskStr = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
             Task newTask = gson.fromJson(taskStr, Task.class);
-            taskManager.addTask(newTask);
-            writeResponse(httpExchange, "Задача типа Task успешно добавлена.", 201);
+            int id = taskManager.addTask(newTask);
+            writeResponse(httpExchange, "{\"id\":"+id+"}", 201);
         } catch (Exception ex) {
             writeResponse(httpExchange, ex.getMessage(), 500);
         }
