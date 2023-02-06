@@ -7,6 +7,6 @@ import java.io.IOException;
 public class HttpTaskServerExecuter {
     public static void main(String[] args) throws IOException, InterruptedException {
         HttpTaskServer httpTaskServer = new HttpTaskServer();
-        httpTaskServer.startHttpTaskServer();
+        httpTaskServer.start();
     }
 }

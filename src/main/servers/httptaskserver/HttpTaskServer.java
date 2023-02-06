@@ -24,20 +24,25 @@ public class HttpTaskServer {
     private final int PORT = 8080;
     private final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
     private final TaskManager taskManager;
+    private final HttpServer httpServer;
 
     private final Gson gson;
 
     public HttpTaskServer() throws IOException, InterruptedException {
         taskManager = Managers.getDefault();
         gson = new Gson();
-    }
 
-    public void startHttpTaskServer() throws IOException {
-        HttpServer httpServer = HttpServer.create();
-
+        httpServer = HttpServer.create();
         httpServer.bind(new InetSocketAddress(PORT), 0);
         httpServer.createContext("/tasks", new TasksHandler());
+    }
+
+    public void start() throws IOException {
         httpServer.start(); // запускаем сервер
+    }
+
+    public void stop() throws IOException {
+        httpServer.stop(1); // запускаем сервер
     }
 
     class TasksHandler implements HttpHandler {
