@@ -174,7 +174,7 @@ public class HttpTaskServerTest {
         response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         Assertions.assertEquals(response.statusCode(), 200);
-        Assertions.assertEquals("{\"epicId\":23,\"name\":\"SubTask1\",\"description\":\"SubTask1 By Epic1\"," +
+        Assertions.assertEquals("{\"epicId\":"+epicId+",\"name\":\"SubTask1\",\"description\":\"SubTask1 By Epic1\"," +
                 "\"id\":" + id + ",\"status\":\"NEW\",\"duration\":0}", response.body());
     }
 
