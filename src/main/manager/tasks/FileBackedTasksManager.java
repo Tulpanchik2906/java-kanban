@@ -42,19 +42,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     protected void save() {
-        /*
-        try (BufferedWriter bufferedWriter = new BufferedWriter(
-                new FileWriter(path.toFile().getName(), StandardCharsets.UTF_8))) {
-            bufferedWriter.append(getFirstStringForSaveInFile());
-            bufferedWriter.newLine();
-            saveTasks(bufferedWriter);
-            saveEpics(bufferedWriter);
-            saveSubTasks(bufferedWriter);
-            bufferedWriter.newLine();
-            bufferedWriter.append(getHistoryString());
-        } catch (IOException ex) {
-            throw new ManagerSaveException(ex.getMessage());
-        }*/
         try (BufferedWriter bufferedWriter = new BufferedWriter(
                 new FileWriter(path.toFile().getName(), StandardCharsets.UTF_8))) {
             bufferedWriter.append(getStringForSave());

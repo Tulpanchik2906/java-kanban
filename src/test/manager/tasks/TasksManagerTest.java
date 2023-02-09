@@ -519,7 +519,7 @@ public abstract class TasksManagerTest<T extends TaskManager> {
     @Test
     public void testGetTaskGetNullWhenNoExistIdWhenTaskListIsNoEmpty() {
         TestDataUtil.addDefault3Task(taskManager);
-        Task task = getTaskManager().getTask(100);
+        Task task = getTaskManager().getTask(100000);
         Assertions.assertNull(task);
     }
 

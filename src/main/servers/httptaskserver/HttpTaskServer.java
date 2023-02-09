@@ -37,11 +37,11 @@ public class HttpTaskServer {
         httpServer.createContext("/tasks", new TasksHandler());
     }
 
-    public void start() throws IOException {
+    public void start() {
         httpServer.start(); // запускаем сервер
     }
 
-    public void stop() throws IOException {
+    public void stop() {
         httpServer.stop(1); // запускаем сервер
     }
 
@@ -169,7 +169,7 @@ public class HttpTaskServer {
             String taskStr = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
             Task newTask = gson.fromJson(taskStr, Task.class);
             int id = taskManager.addTask(newTask);
-            writeResponse(httpExchange, "{\"id\":"+id+"}", 201);
+            writeResponse(httpExchange, "{\"id\":" + id + "}", 201);
         } catch (Exception ex) {
             writeResponse(httpExchange, ex.getMessage(), 500);
         }
@@ -233,8 +233,8 @@ public class HttpTaskServer {
             InputStream inputStream = httpExchange.getRequestBody();
             String taskStr = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
             Epic newEpic = gson.fromJson(taskStr, Epic.class);
-            taskManager.addEpic(newEpic);
-            writeResponse(httpExchange, "Задача типа Epic успешно добавлена.", 201);
+            int id = taskManager.addEpic(newEpic);
+            writeResponse(httpExchange, "{\"id\":" + id + "}", 201);
         } catch (Exception ex) {
             writeResponse(httpExchange, ex.getMessage(), 500);
         }
@@ -298,8 +298,8 @@ public class HttpTaskServer {
             InputStream inputStream = httpExchange.getRequestBody();
             String taskStr = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
             SubTask subTask = gson.fromJson(taskStr, SubTask.class);
-            taskManager.addSubTask(subTask);
-            writeResponse(httpExchange, "Задача типа SubTask успешно добавлена.", 201);
+            int id = taskManager.addSubTask(subTask);
+            writeResponse(httpExchange, "{\"id\":" + id + "}", 201);
         } catch (Exception ex) {
             writeResponse(httpExchange, ex.getMessage(), 500);
         }
@@ -320,7 +320,7 @@ public class HttpTaskServer {
     private void handleCleanSubTasks(HttpExchange httpExchange) throws IOException {
         try {
             taskManager.cleanSubTasks();
-            writeResponse(httpExchange, "Все задачи типа SubTasks удалены.", 200);
+            writeResponse(httpExchange, "Все задачи типа SubTask удалены.", 200);
         } catch (Exception ex) {
             writeResponse(httpExchange, ex.getMessage(), 500);
         }
